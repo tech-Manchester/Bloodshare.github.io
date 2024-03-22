@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blood Group Inventory</title>
+  </head>
+  <body>
+    <div class="bg-white overflow-auto">
+      <table class="min-w-full bg-white">
+        <thead class="bg-gray-800 text-white">
+          <tr>
+            <th
+              class="w-1/3 text-left py-3 px-4 uppercase font-semibold text-sm"
+            >
+              Blood Group Name
+            </th>
+            <th
+              class="w-1/3 text-left py-3 px-4 uppercase font-semibold text-sm"
+            >
+              Last Updated
+            </th>
+            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">
+              Capacity
+            </th>
+          </tr>
+        </thead>
+        <tbody id="bloodGroupTableBody" class="text-gray-700">
+          <!-- Table body will be dynamically populated -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Import Firebase JavaScript SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js"></script>
+
+    <!-- Initialize Firebase -->
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBh89RtEGcYz3INTFW_kzScAM76aodLtA8",
+        authDomain: "bloodshare-94c37.firebaseapp.com",
+        databaseURL: "https://bloodshare-94c37-default-rtdb.firebaseio.com",
+        projectId: "bloodshare-94c37",
+        storageBucket: "bloodshare-94c37.appspot.com",
+        messagingSenderId: "282338631910",
+        appId: "1:282338631910:web:b797c8905c60870b7d5b27",
+        measurementId: "G-CCW4K9CET6",
+      };
+      firebase.initializeApp(firebaseConfig);
+    </script>
+
+    <!-- Your HTML code here -->
+
+    <!-- Script to fetch and update data -->
+    <script>
+      // Reference to the BloodGroupInventory node in your Firebase database
+      const bloodGroupInventoryRef = firebase
+        .database()
+        .ref("BloodGroupInventory");
+
+      // Function to fetch and update the table data
+      function fetchAndUpdateTableData() {
+        bloodGroupInventoryRef.once("value", function (snapshot) {
+          // Get the snapshot of the entire BloodGroupInventory node
+          const bloodGroupInventoryData = snapshot.val();
+
+          // Clear existing table data
+          const tableBody = document.getElementById("table-body");
+          tableBody.innerHTML = "";
+
+          // Iterate over each user's blood group inventory
+          for (const userId in bloodGroupInventoryData) {
+            if (bloodGroupInventoryData.hasOwnProperty(userId)) {
+              const userBloodGroupInventory = bloodGroupInventoryData[userId];
+              // Iterate over each blood group in the user's inventory
+              for (const bloodGroup in userBloodGroupInventory) {
+                if (userBloodGroupInventory.hasOwnProperty(bloodGroup)) {
+                  const count = userBloodGroupInventory[bloodGroup];
+                  // Create a new row in the table for each blood group
+                  const newRow = document.createElement("tr");
+                  newRow.innerHTML = `
+                <td class="w-1/3 text-left py-3 px-4">${bloodGroup}</td>
+                <td class="w-1/3 text-left py-3 px-4">Now</td> <!-- You can replace 'Now' with actual timestamp if available -->
+                <td class="text-left py-3 px-4">
+                  <a class="hover:text-blue-500" href="tel:622322662">${count}</a>
+                </td>
+              `;
+                  tableBody.appendChild(newRow);
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Call the function to fetch and update table data when the page loads
+      window.onload = fetchAndUpdateTableData;
+    </script>
+  </body>
+</html>
